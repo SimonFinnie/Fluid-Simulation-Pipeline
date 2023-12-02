@@ -1,0 +1,20 @@
+#version 430 core
+out vec4 FragColor;
+
+in vec2 TexCoord;
+
+uniform sampler2D ourTexture;
+
+
+void main()
+{
+    FragColor = texture(ourTexture, TexCoord);
+    FragColor = abs(FragColor);
+    FragColor = FragColor/500;
+
+    if(FragColor.y < 0.01f && FragColor.x < 0.01f){
+        FragColor.y = 0;
+        FragColor.x = 0;
+        FragColor.z = 0;
+    }
+} 

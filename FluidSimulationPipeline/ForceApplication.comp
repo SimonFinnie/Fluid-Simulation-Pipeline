@@ -1,0 +1,63 @@
+#version 430 core
+
+layout (local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(rgba32f, binding = 0) uniform image2D imgInputOutput;
+
+layout (location = 0) uniform ivec2 lastClickedLocation;
+layout (location = 1) uniform ivec2 clickedLocation;
+layout (location = 2) uniform float timestep;
+layout (location = 3) uniform vec2 force;
+layout (location = 4) uniform float impulseRadius;
+layout (location = 5) uniform ivec2 imageSize;
+
+void main(){
+	ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
+	
+	vec2 appliedForce = force;
+	vec2 mouseMoveVec = clickedLocation - lastClickedLocation;
+
+	//If mouse movement is too small
+	if(length(mouseMoveVec) <= impulseRadius){
+		float dist = distance(texelCoord, clickedLocation);
+		vec2 relativeDistance = vec2(texelCoord - clickedLocation);
+
+		if(length(relativeDistance) <= impulseRadius){
+			imageStore(imgInputOutput, texelCoord, vec4(appliedForce.x,appliedForce.y, 0, 0));
+		}
+	}
+	else{
+		//Calculates a capsule between the two last clicked locations
+		vec2 normMouseMoveVec = normalize(mouseMoveVec);
+		vec2 upVec = {0,1};
+		float angle = acos(dot(normMouseMoveVec, upVec));
+		if(normMouseMoveVec.x > 0){
+			angle *= -1;
+		}
+		mat2 rotMat;
+		rotMat[0] = vec2(cos(angle), -sin(angle));
+		rotMat[1] = vec2(sin(angle), cos(angle));
+
+		vec2 relativePos = texelCoord - lastClickedLocation;
+		relativePos = rotMat * relativePos;
+
+		//middle of capsule
+		if(relativePos.y  > 0 && relativePos.y  <= length(mouseMoveVec) && relativePos.x >= -impulseRadius && relativePos.x <= impulseRadius){
+			imageStore(imgInputOutput, texelCoord, vec4(appliedForce.x,appliedForce.y, 0, 0));
+		}
+		//top and bottom
+		if(length(relativePos) < impulseRadius){
+			imageStore(imgInputOutput, texelCoord, vec4(appliedForce.x,appliedForce.y, 0, 0));
+		}
+		vec2 relativeDistance = vec2(texelCoord - clickedLocation);
+		if(length(relativeDistance) <= impulseRadius){
+			imageStore(imgInputOutput, texelCoord, vec4(appliedForce.x,appliedForce.y, 0, 0));
+		}
+	}
+	//accounts for boundary
+	if(texelCoord.x < 1 || texelCoord.y < 1 || texelCoord.x == imageSize.x - 1 || texelCoord.y == imageSize.x - 1 ){
+		imageStore(imgInputOutput, texelCoord, vec4(0));
+	}
+}
+
+

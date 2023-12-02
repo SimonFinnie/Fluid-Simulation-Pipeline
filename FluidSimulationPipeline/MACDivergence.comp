@@ -1,0 +1,21 @@
+#version 430 core
+
+layout (local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(rgba32f, binding = 0) uniform image2D inVelocity;
+layout(rgba32f, binding = 1) uniform image2D outDivergence;
+
+layout (location = 0) uniform ivec2 imageSize;
+layout (location = 1) uniform float rdx;
+
+void main(){
+	ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
+	vec4 wL = imageLoad(inVelocity, texelCoord - ivec2(1,0));
+	vec4 wB = imageLoad(inVelocity, texelCoord - ivec2(0,1));
+	vec4 currValue = imageLoad(inVelocity, texelCoord);
+
+	float div = rdx * ((currValue.x - wL.x) + (currValue.y - wB.y));
+
+	vec4 result = vec4(div,0,0,0);
+	imageStore(outDivergence, texelCoord, result);
+}

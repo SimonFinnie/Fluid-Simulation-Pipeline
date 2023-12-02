@@ -1,0 +1,31 @@
+#version 430 core
+
+layout (local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(rgba32f, binding = 0) uniform image2D pressureImage;
+layout(rgba32f, binding = 1) uniform image2D velocityImage;
+
+layout (location = 0) uniform ivec2 imageSize;
+layout (location = 1) uniform float rdx;
+
+void main(){
+	ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
+	float currentP = imageLoad(pressureImage, texelCoord).x;
+	float pR = imageLoad(pressureImage, texelCoord + ivec2(1,0)).x;
+	float pT = imageLoad(pressureImage, texelCoord + ivec2(0,1)).x;
+
+	//vec4 grad = 0.5 * vec4(pR - currentP, pT - currentP, 0, 0);
+	vec2 currVelocity = imageLoad(velocityImage, texelCoord).xy;
+	vec2 divFreeVelocity = currVelocity.xy - rdx*vec2(pR - currentP, pT - currentP);
+	if(texelCoord.x < 1 || texelCoord.x == imageSize.x - 1){
+		divFreeVelocity.x = 0;
+	}
+	if(texelCoord.y < 1 || texelCoord.y == imageSize.y - 1){
+		divFreeVelocity.y = 0;
+	}
+
+	vec4 result = vec4(divFreeVelocity, 0, 0);
+
+	imageStore(velocityImage, texelCoord, result);
+}
+
