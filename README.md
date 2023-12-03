@@ -13,9 +13,9 @@ Notable features of the fluid system:
 * Solid wall boundary conditions for the outer walls of the textures.
 
 <p float="left" align="center">
-  <img src="/Images/FluidInteraction.gif" width="300" />
-  <img src="/Images/FluidRun.gif" width="300" /> 
-  <img src="/Images/FluidSpiral.gif" width="300" />
+  <img src="/Images/FluidInteraction.gif" width="250" />
+  <img src="/Images/FluidRun.gif" width="250" /> 
+  <img src="/Images/FluidSpiral.gif" width="250" />
 </p>
 
 
