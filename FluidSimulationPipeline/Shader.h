@@ -1,6 +1,10 @@
 #ifndef SHADER_H
 #define SHADER_H
-#include <glad/glad.h>
+#ifdef _WIN32
+#include <glad/glad.h> 
+#elif linux
+#include "glad.h"
+#endif
 #include <glm/glm.hpp>
 
 #include <string>

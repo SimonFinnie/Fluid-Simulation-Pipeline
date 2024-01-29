@@ -1,6 +1,10 @@
 #include "Renderer.h"
 #include "Shader.h"
-#include <glad/glad.h>
+#ifdef _WIN32
+#include <glad/glad.h> 
+#elif linux
+#include "glad.h"
+#endif
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>

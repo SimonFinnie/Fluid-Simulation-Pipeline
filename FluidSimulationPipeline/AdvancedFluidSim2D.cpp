@@ -1,7 +1,11 @@
 #include "AdvancedFluidSim2D.h"
 #include "FluidController2D.h"
 #include "ComputeShader.h"
-#include <glad/glad.h>
+#ifdef _WIN32
+#include <glad/glad.h> 
+#elif linux
+#include "glad.h"
+#endif
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
